@@ -1,8 +1,9 @@
 :root {
   --primary: #ff6b6b;
   --secondary: #4ecdc4;
+  --white: #fff;
   --accent: #ffe66d;
-  --bg: #f7fff7;
+  --bg: #f3f3f3;
   --text: #292f36;
   --correct: #6bcb77;
   --wrong: #ff6b6b;
@@ -119,6 +120,13 @@ body {
   transform: scale(0.95);
 }
 
+.quiz-screen .progress {
+    background: var(--secondary);
+    color: var(--white);
+    padding: .25em 2em;
+    border-radius: var(--radius);
+}
+
 .quiz-screen .question {
   font-size: 3rem;
   font-weight: bold;
@@ -205,4 +213,31 @@ body {
   border-radius: 10px;
   padding: 5px 10px;
   font-weight: bold;
+}
+
+.feedback {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 15px;
+  min-height: 60px;  /* adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.feedback.empty {
+  background: transparent;
+  color: transparent;
+}
+
+.feedback.correct {
+  background: #d4edda;
+  color: #155724;
+}
+
+.feedback.wrong {
+  background: #f8d7da;
+  color: #721c24;
 }

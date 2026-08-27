@@ -1,9 +1,10 @@
+import { translations } from '../utils/translations';
+
 export default function LanguageSwitcher({ language, onChange }) {
-  const languages = [
-    { code: 'en', label: 'EN' },
-    { code: 'ru', label: 'RU' },
-    { code: 'by', label: 'BY' },
-  ];
+  const languages = Object.keys(translations).map((code) => ({
+    code,
+    label: code.toUpperCase(),
+  }));
 
   return (
     <div className="language-switcher">

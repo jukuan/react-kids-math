@@ -31,14 +31,15 @@ export default function QuizScreen({ questions, t, onFinish }) {
         setUserAnswer('');
         setFeedback({ isCorrect: null, correctAnswer: null });
       }
-    }, feedback.isCorrect ? 800 : 1500);
+    }, feedback.isCorrect ? 1200 : 2000);
     return () => clearTimeout(timer);
   }, [feedback, currentIndex, questions.length, onFinish, answers]);
 
   return (
     <div className="screen quiz-screen">
       <div className="progress">
-        {t.question} {currentIndex + 1} / {questions.length}
+        <span className="progress-question">{t.question} </span>
+        <span className="progress-i_length"> [{currentIndex + 1} / {questions.length}]</span>
       </div>
       <div className="question">
         {currentQuestion.a} × {currentQuestion.b} = ?
