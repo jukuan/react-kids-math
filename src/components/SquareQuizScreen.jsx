@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import FeedbackMessage from './FeedbackMessage';
 
-const ANSWER_TIME_LIMIT = 15; // seconds
+const ANSWER_TIME_LIMIT = 20; // seconds, more time for harder questions
 
-export default function QuizScreen({ questions, t, onFinish }) {
+export default function SquareQuizScreen({ questions, t, onFinish }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState({ isCorrect: null, correctAnswer: null });
@@ -11,24 +11,29 @@ export default function QuizScreen({ questions, t, onFinish }) {
   const [timeLeft, setTimeLeft] = useState(ANSWER_TIME_LIMIT);
   const timerRef = useRef(null);
   const feedbackRef = useRef(feedback);
+  const currentQuestionRef = useRef(questions[currentIndex]);
 
-  const currentQuestion = questions[currentIndex];
-  const correctAnswer = currentQuestion.a * currentQuestion.b;
-
-  // Keep a ref to the current feedback state
+  // Update refs
   useEffect(() => {
     feedbackRef.current = feedback;
   }, [feedback]);
 
+  useEffect(() => {
+    currentQuestionRef.current = questions[currentIndex];
+  }, [currentIndex, questions]);
+
   const handleTimeout = useCallback(() => {
     if (feedbackRef.current.isCorrect !== null) return;
+    
+    const currentQuestion = currentQuestionRef.current;
+    const correctAnswer = currentQuestion.a * currentQuestion.b;
     
     setFeedback({ isCorrect: false, correctAnswer });
     setAnswers((prev) => [
       ...prev,
       { a: currentQuestion.a, b: currentQuestion.b, isCorrect: false },
     ]);
-  }, [correctAnswer, currentQuestion.a, currentQuestion.b]);
+  }, []); // No dependencies, uses refs
 
   // Reset and start timer for each question
   useEffect(() => {
@@ -54,7 +59,7 @@ export default function QuizScreen({ questions, t, onFinish }) {
         clearInterval(timerRef.current);
       }
     };
-  }, [currentIndex, handleTimeout]);
+  }, [currentIndex, handleTimeout]); // handleTimeout is stable now
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -73,6 +78,9 @@ export default function QuizScreen({ questions, t, onFinish }) {
     ]);
   };
 
+  const currentQuestion = questions[currentIndex];
+  const correctAnswer = currentQuestion.a * currentQuestion.b;
+
   // Auto-advance after feedback
   useEffect(() => {
     if (feedback.isCorrect === null) return;
@@ -84,13 +92,13 @@ export default function QuizScreen({ questions, t, onFinish }) {
         setUserAnswer('');
         setFeedback({ isCorrect: null, correctAnswer: null });
       }
-    }, feedback.isCorrect ? 1200 : 2000);
+    }, feedback.isCorrect ? 1500 : 2500);
     return () => clearTimeout(timer);
   }, [feedback, currentIndex, questions.length, onFinish, answers]);
 
   const getTimerClass = () => {
-    if (timeLeft > 10) return 'timer-normal';
-    if (timeLeft > 5) return 'timer-warning';
+    if (timeLeft > 15) return 'timer-normal';
+    if (timeLeft > 8) return 'timer-warning';
     return 'timer-danger';
   };
 
@@ -102,7 +110,7 @@ export default function QuizScreen({ questions, t, onFinish }) {
       <div className={`timer ${getTimerClass()}`}>
         ⏱ {timeLeft}s
       </div>
-      <div className="question">
+      <div className="question square-question">
         {currentQuestion.a} × {currentQuestion.b} = ?
       </div>
       <form onSubmit={handleSubmit}>
