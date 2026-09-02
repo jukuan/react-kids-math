@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import FeedbackMessage from './FeedbackMessage';
 
-const ANSWER_TIME_LIMIT = 20; // seconds, more time for harder questions
+const ANSWER_TIME_LIMIT = 20; // seconds
 
-export default function SquareQuizScreen({ questions, t, onFinish }) {
+export default function SquareQuizScreen({ questions, t, onFinish, onFinishEarly }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState({ isCorrect: null, correctAnswer: null });
@@ -13,7 +13,6 @@ export default function SquareQuizScreen({ questions, t, onFinish }) {
   const feedbackRef = useRef(feedback);
   const currentQuestionRef = useRef(questions[currentIndex]);
 
-  // Update refs
   useEffect(() => {
     feedbackRef.current = feedback;
   }, [feedback]);
@@ -33,9 +32,8 @@ export default function SquareQuizScreen({ questions, t, onFinish }) {
       ...prev,
       { a: currentQuestion.a, b: currentQuestion.b, isCorrect: false },
     ]);
-  }, []); // No dependencies, uses refs
+  }, []);
 
-  // Reset and start timer for each question
   useEffect(() => {
     setTimeLeft(ANSWER_TIME_LIMIT);
     
@@ -59,7 +57,7 @@ export default function SquareQuizScreen({ questions, t, onFinish }) {
         clearInterval(timerRef.current);
       }
     };
-  }, [currentIndex, handleTimeout]); // handleTimeout is stable now
+  }, [currentIndex, handleTimeout]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -78,10 +76,16 @@ export default function SquareQuizScreen({ questions, t, onFinish }) {
     ]);
   };
 
+  const handleFinishEarly = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    onFinishEarly(answers);
+  };
+
   const currentQuestion = questions[currentIndex];
   const correctAnswer = currentQuestion.a * currentQuestion.b;
 
-  // Auto-advance after feedback
   useEffect(() => {
     if (feedback.isCorrect === null) return;
     const timer = setTimeout(() => {
@@ -131,6 +135,9 @@ export default function SquareQuizScreen({ questions, t, onFinish }) {
         correctAnswer={correctAnswer}
         t={t}
       />
+      <button className="secondary-btn" onClick={handleFinishEarly}>
+        {t.finishRound}
+      </button>
     </div>
   );
 }

@@ -21,6 +21,7 @@ export const translations = {
     time: 'Time',
     mistakes: 'Mistakes',
     backToMenu: 'Back to Menu',
+    finishRound: 'Finish Round',
   },
   ru: {
     appTitle: 'Таблица умножения',
@@ -44,6 +45,7 @@ export const translations = {
     time: 'Время',
     mistakes: 'Ошибки',
     backToMenu: 'В меню',
+    finishRound: 'Завершить раунд',
   },
   by: {
     appTitle: 'Табліца множання',
@@ -67,6 +69,7 @@ export const translations = {
     time: 'Час',
     mistakes: 'Памылкі',
     backToMenu: 'У меню',
+    finishRound: 'Скончыць раўнд',
   },
   pl: {
     appTitle: 'Tabliczka mnożenia',
@@ -90,6 +93,7 @@ export const translations = {
     time: 'Czas',
     mistakes: 'Błędy',
     backToMenu: 'Powrót do menu',
+    finishRound: 'Zakończ rundę',
   },
   es: {
     appTitle: 'Tabla de multiplicar',
@@ -113,5 +117,6 @@ export const translations = {
     time: 'Tiempo',
     mistakes: 'Errores',
     backToMenu: 'Volver al menú',
+    finishRound: 'Terminar ronda'
   },
 };

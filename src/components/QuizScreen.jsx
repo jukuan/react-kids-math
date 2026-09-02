@@ -3,7 +3,7 @@ import FeedbackMessage from './FeedbackMessage';
 
 const ANSWER_TIME_LIMIT = 15; // seconds
 
-export default function QuizScreen({ questions, t, onFinish }) {
+export default function QuizScreen({ questions, t, onFinish, onFinishEarly }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState({ isCorrect: null, correctAnswer: null });
@@ -15,7 +15,6 @@ export default function QuizScreen({ questions, t, onFinish }) {
   const currentQuestion = questions[currentIndex];
   const correctAnswer = currentQuestion.a * currentQuestion.b;
 
-  // Keep a ref to the current feedback state
   useEffect(() => {
     feedbackRef.current = feedback;
   }, [feedback]);
@@ -30,7 +29,6 @@ export default function QuizScreen({ questions, t, onFinish }) {
     ]);
   }, [correctAnswer, currentQuestion.a, currentQuestion.b]);
 
-  // Reset and start timer for each question
   useEffect(() => {
     setTimeLeft(ANSWER_TIME_LIMIT);
     
@@ -73,7 +71,14 @@ export default function QuizScreen({ questions, t, onFinish }) {
     ]);
   };
 
-  // Auto-advance after feedback
+  const handleFinishEarly = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    // Pass current answers to parent
+    onFinishEarly(answers);
+  };
+
   useEffect(() => {
     if (feedback.isCorrect === null) return;
     const timer = setTimeout(() => {
@@ -123,6 +128,9 @@ export default function QuizScreen({ questions, t, onFinish }) {
         correctAnswer={correctAnswer}
         t={t}
       />
+      <button className="secondary-btn" onClick={handleFinishEarly}>
+        {t.finishRound}
+      </button>
     </div>
   );
 }

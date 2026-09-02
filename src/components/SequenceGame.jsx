@@ -76,7 +76,7 @@ export default function SequenceGame({ t, onFinish }) {
             key={index}
             className={`sequence-cell ${
               foundNumbers.includes(number) ? 'found' : ''
-            } ${number === nextNumber ? 'highlight' : ''}`}
+            } ${number === nextNumber ? '-t-highlight' : ''}`}
             onClick={() => handleNumberClick(number)}
             disabled={foundNumbers.includes(number)}
           >

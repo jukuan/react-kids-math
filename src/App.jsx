@@ -20,7 +20,7 @@ export default function App() {
   const [language, setLanguage] = useLocalStorage('language', 'en');
   const [totalStars, setTotalStars] = useLocalStorage('totalStars', 0);
   const [tableStats, setTableStats] = useLocalStorage('tableStats', {});
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'start' | 'quiz' | 'square' | 'sequence' | 'result'
+  const [screen, setScreen] = useState('menu');
   const [questions, setQuestions] = useState([]);
   const [lastScore, setLastScore] = useState(0);
   const [sequenceResult, setSequenceResult] = useState(null);
@@ -90,6 +90,30 @@ export default function App() {
     setScreen('menu');
   };
 
+  // New handlers for early finish
+  const handleQuizFinishEarly = useCallback(
+    (answers) => {
+      // If no answers, just go back to menu
+      if (answers.length === 0) {
+        setScreen('menu');
+        return;
+      }
+      handleQuizFinish(answers);
+    },
+    [handleQuizFinish]
+  );
+
+  const handleSquareFinishEarly = useCallback(
+    (answers) => {
+      if (answers.length === 0) {
+        setScreen('menu');
+        return;
+      }
+      handleSquareFinish(answers);
+    },
+    [handleSquareFinish]
+  );
+
   return (
     <div className="app">
       {screen === 'menu' && (
@@ -121,6 +145,7 @@ export default function App() {
           questions={questions}
           t={t}
           onFinish={handleQuizFinish}
+          onFinishEarly={handleQuizFinishEarly}
         />
       )}
 
@@ -129,6 +154,7 @@ export default function App() {
           questions={questions}
           t={t}
           onFinish={handleSquareFinish}
+          onFinishEarly={handleSquareFinishEarly}
         />
       )}
 
@@ -160,6 +186,14 @@ export default function App() {
           </button>
         </div>
       )}
+
+      <footer className="app-footer">
+        <p className="text-right">
+          <a href="mailto:y.misiukevich@gmail.com">📨</a>
+          <span> </span>
+          <a href="https://Juljan.By" target="_blank" rel="noopener noreferrer">Juljan.By</a>
+        </p>
+      </footer>
     </div>
   );
 }
