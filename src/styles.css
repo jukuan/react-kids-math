@@ -64,6 +64,7 @@ body {
   font-size: 2rem;
   color: var(--primary);
   text-shadow: 2px 2px 0 var(--accent);
+  line-height: 1;
 }
 
 .star-display {
@@ -281,6 +282,7 @@ body {
 }
 
 .mode-btn {
+  line-height: 1;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -429,6 +431,10 @@ body {
   text-align: right;
   font-size: 0.9rem;
   color: #666;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-footer a {
@@ -440,8 +446,7 @@ body {
   text-decoration: underline;
 }
 
-.app-footer {
-  font-size: 12px;
+.text-muted {
   opacity: .65;
 }
 

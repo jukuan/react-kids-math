@@ -156,7 +156,7 @@ export default function App() {
       {screen === 'menu' && (
         <div className="screen menu-screen">
           <div className="mascot">
-            <img src="/mascot-removebg.png" height="94" alt="mascot"/>
+            <img src="/mascot-removebg.png" height="90" alt="mascot"/>
           </div>
           <h1 className="app-title">{t.appTitle}</h1>
           <StarDisplay totalStars={totalStars} />
@@ -237,7 +237,7 @@ export default function App() {
         </div>
       )}
 
-      <Footer t={t} />
+      {screen === 'menu' && <Footer t={t} />}
     </div>
   );
 }

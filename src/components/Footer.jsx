@@ -12,7 +12,7 @@ export default function Footer({ t }) {
           </button>
         )}
       </div>
-      <div className="right-cell text-right">
+      <div className="right-cell text-muted">
         {t.authorWebsite}:{' '}
         <a href="https://juljan.by" target="_blank" rel="noopener noreferrer">
           juljan.by
