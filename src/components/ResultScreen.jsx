@@ -7,6 +7,7 @@ export default function ResultScreen({
   hardTables,
   earnedStars,
   onPlayAgain,
+  hideHardTables = false,
 }) {
   return (
     <div className="screen result-screen">
@@ -15,20 +16,22 @@ export default function ResultScreen({
       </h2>
       {score === totalQuestions && <p className="perfect-message">{t.perfect}</p>}
       <StarDisplay totalStars={earnedStars} />
-      <div className="hard-tables">
-        {hardTables.length > 0 ? (
-          <>
-            <p>{t.hardTables}</p>
-            <ul>
-              {hardTables.map((table) => (
-                <li key={table}>× {table}</li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p>{t.noHardTables}</p>
-        )}
-      </div>
+      {!hideHardTables && (
+        <div className="hard-tables">
+          {hardTables.length > 0 ? (
+            <>
+              <p>{t.hardTables}</p>
+              <ul>
+                {hardTables.map((table) => (
+                  <li key={table}>× {table}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p>{t.noHardTables}</p>
+          )}
+        </div>
+      )}
       <button className="primary-btn" onClick={onPlayAgain}>
         {t.playAgain}
       </button>

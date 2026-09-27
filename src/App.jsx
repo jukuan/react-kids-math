@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import QuizScreen from './components/QuizScreen';
 import SquareQuizScreen from './components/SquareQuizScreen';
+import DivisionQuizScreen from './components/DivisionQuizScreen';
 import SequenceGame from './components/SequenceGame';
 import ResultScreen from './components/ResultScreen';
 import StarDisplay from './components/StarDisplay';
@@ -12,7 +13,9 @@ import {
   getHardTables,
 } from './utils/questionGenerator';
 import { generateSquareQuestions } from './utils/squareQuestionGenerator';
+import { generateDivisionQuestions } from './utils/divisionQuestionGenerator';
 import { updateTableStats } from './utils/stats';
+import Footer from './components/Footer';
 
 const QUESTIONS_PER_ROUND = 10;
 
@@ -24,19 +27,29 @@ export default function App() {
   const [questions, setQuestions] = useState([]);
   const [lastScore, setLastScore] = useState(0);
   const [sequenceResult, setSequenceResult] = useState(null);
+  const [lastMode, setLastMode] = useState('multiplication');
 
   const t = translations[language] || translations.en;
 
   const handleStartMultiplication = useCallback(() => {
     const newQuestions = generateWeightedQuestions(QUESTIONS_PER_ROUND, tableStats);
     setQuestions(newQuestions);
+    setLastMode('multiplication');
     setScreen('quiz');
   }, [tableStats]);
 
   const handleStartSquare = useCallback(() => {
     const newQuestions = generateSquareQuestions(QUESTIONS_PER_ROUND);
     setQuestions(newQuestions);
+    setLastMode('square');
     setScreen('square');
+  }, []);
+
+  const handleStartDivision = useCallback(() => {
+    const newQuestions = generateDivisionQuestions(QUESTIONS_PER_ROUND);
+    setQuestions(newQuestions);
+    setLastMode('division');
+    setScreen('division');
   }, []);
 
   const handleStartSequence = useCallback(() => {
@@ -68,6 +81,19 @@ export default function App() {
       setLastScore(score);
 
       const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 5 : 0);
+      setTotalStars((prev) => prev + earnedStars);
+
+      setScreen('result');
+    },
+    [setTotalStars]
+  );
+
+  const handleDivisionFinish = useCallback(
+    (answers) => {
+      const score = answers.filter((a) => a.isCorrect).length;
+      setLastScore(score);
+
+      const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
       setTotalStars((prev) => prev + earnedStars);
 
       setScreen('result');
@@ -114,15 +140,28 @@ export default function App() {
     [handleSquareFinish]
   );
 
+  const handleDivisionFinishEarly = useCallback(
+    (answers) => {
+      if (answers.length === 0) {
+        setScreen('menu');
+        return;
+      }
+      handleDivisionFinish(answers);
+    },
+    [handleDivisionFinish]
+  );
+
   return (
     <div className="app">
       {screen === 'menu' && (
         <div className="screen menu-screen">
-          <div className="mascot">🦊</div>
+          <div className="mascot">
+            <img src="/mascot-removebg.png" height="94" alt="mascot"/>
+          </div>
           <h1 className="app-title">{t.appTitle}</h1>
           <StarDisplay totalStars={totalStars} />
           <LanguageSwitcher language={language} onChange={setLanguage} />
-          
+
           <div className="game-modes">
             <button className="mode-btn" onClick={handleStartMultiplication}>
               <span className="mode-icon">✖️</span>
@@ -131,6 +170,10 @@ export default function App() {
             <button className="mode-btn" onClick={handleStartSquare}>
               <span className="mode-icon">🔢</span>
               {t.squareNumbers}
+            </button>
+            <button className="mode-btn" onClick={handleStartDivision}>
+              <span className="mode-icon">➗</span>
+              {t.division}
             </button>
             <button className="mode-btn" onClick={handleStartSequence}>
               <span className="mode-icon">🔍</span>
@@ -158,11 +201,17 @@ export default function App() {
         />
       )}
 
-      {screen === 'sequence' && (
-        <SequenceGame
+      {screen === 'division' && (
+        <DivisionQuizScreen
+          questions={questions}
           t={t}
-          onFinish={handleSequenceFinish}
+          onFinish={handleDivisionFinish}
+          onFinishEarly={handleDivisionFinishEarly}
         />
+      )}
+
+      {screen === 'sequence' && (
+        <SequenceGame t={t} onFinish={handleSequenceFinish} />
       )}
 
       {screen === 'result' && (
@@ -173,6 +222,7 @@ export default function App() {
           hardTables={getHardTables(tableStats)}
           earnedStars={lastScore + (lastScore === QUESTIONS_PER_ROUND ? 3 : 0)}
           onPlayAgain={handleBackToMenu}
+          hideHardTables={lastMode !== 'multiplication'}
         />
       )}
 
@@ -187,13 +237,7 @@ export default function App() {
         </div>
       )}
 
-      <footer className="app-footer">
-        <p className="text-right">
-          <a href="mailto:y.misiukevich@gmail.com">📨</a>
-          <span> </span>
-          <a href="https://Juljan.By" target="_blank" rel="noopener noreferrer">Juljan.By</a>
-        </p>
-      </footer>
+      <Footer t={t} />
     </div>
   );
 }

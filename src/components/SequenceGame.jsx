@@ -13,7 +13,7 @@ function shuffleArray(array) {
 }
 
 export default function SequenceGame({ t, onFinish }) {
-  const [numbers, setNumbers] = useState(() => 
+  const [numbers, setNumbers] = useState(() =>
     shuffleArray(Array.from({ length: GRID_SIZE }, (_, i) => i + 1))
   );
   const [nextNumber, setNextNumber] = useState(1);
@@ -42,7 +42,6 @@ export default function SequenceGame({ t, onFinish }) {
     if (number === nextNumber) {
       setFoundNumbers([...foundNumbers, number]);
       if (nextNumber === GRID_SIZE) {
-        // Game complete
         clearInterval(timerRef.current);
         const finalTime = Math.floor((Date.now() - startTime) / 1000);
         onFinish({ time: finalTime, mistakes });
@@ -54,29 +53,33 @@ export default function SequenceGame({ t, onFinish }) {
     }
   };
 
+  const handleFinishEarly = () => {
+    clearInterval(timerRef.current);
+    const finalTime = startTime
+      ? Math.floor((Date.now() - startTime) / 1000)
+      : 0;
+    onFinish({ time: finalTime, mistakes });
+  };
+
   return (
     <div className="screen sequence-screen">
       <div className="sequence-header">
         <div className="sequence-target">
           {t.findNumber}: <strong>{nextNumber}</strong>
         </div>
-        <div className="sequence-timer">
-          ⏱ {elapsedTime}s
-        </div>
+        <div className="sequence-timer">⏱ {elapsedTime}s</div>
         {mistakes > 0 && (
-          <div className="sequence-mistakes">
-            ❌ {mistakes}
-          </div>
+          <div className="sequence-mistakes">❌ {mistakes}</div>
         )}
       </div>
-      
+
       <div className="sequence-grid">
         {numbers.map((number, index) => (
           <button
             key={index}
             className={`sequence-cell ${
               foundNumbers.includes(number) ? 'found' : ''
-            } ${number === nextNumber ? '-t-highlight' : ''}`}
+            } ${number === nextNumber ? 'highlight' : ''}`}
             onClick={() => handleNumberClick(number)}
             disabled={foundNumbers.includes(number)}
           >
@@ -84,6 +87,10 @@ export default function SequenceGame({ t, onFinish }) {
           </button>
         ))}
       </div>
+
+      <button className="secondary-btn" onClick={handleFinishEarly}>
+        {t.finishRound}
+      </button>
     </div>
   );
 }
