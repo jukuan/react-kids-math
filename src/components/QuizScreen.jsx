@@ -21,7 +21,7 @@ export default function QuizScreen({ questions, t, onFinish, onFinishEarly }) {
 
   const handleTimeout = useCallback(() => {
     if (feedbackRef.current.isCorrect !== null) return;
-    
+
     setFeedback({ isCorrect: false, correctAnswer });
     setAnswers((prev) => [
       ...prev,
@@ -29,13 +29,12 @@ export default function QuizScreen({ questions, t, onFinish, onFinishEarly }) {
     ]);
   }, [correctAnswer, currentQuestion.a, currentQuestion.b]);
 
+  // Start the timer for the current question
   useEffect(() => {
-    setTimeLeft(ANSWER_TIME_LIMIT);
-    
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -57,11 +56,11 @@ export default function QuizScreen({ questions, t, onFinish, onFinishEarly }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (feedback.isCorrect !== null) return;
-    
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     const answer = Number(userAnswer);
     const isCorrect = answer === correctAnswer;
     setFeedback({ isCorrect, correctAnswer });
@@ -75,16 +74,17 @@ export default function QuizScreen({ questions, t, onFinish, onFinishEarly }) {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    // Pass current answers to parent
     onFinishEarly(answers);
   };
 
+  // Auto-advance after feedback
   useEffect(() => {
     if (feedback.isCorrect === null) return;
     const timer = setTimeout(() => {
       if (currentIndex === questions.length - 1) {
         onFinish(answers);
       } else {
+        setTimeLeft(ANSWER_TIME_LIMIT); // reset timer for next question
         setCurrentIndex((prev) => prev + 1);
         setUserAnswer('');
         setFeedback({ isCorrect: null, correctAnswer: null });

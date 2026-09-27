@@ -23,10 +23,10 @@ export default function SquareQuizScreen({ questions, t, onFinish, onFinishEarly
 
   const handleTimeout = useCallback(() => {
     if (feedbackRef.current.isCorrect !== null) return;
-    
+
     const currentQuestion = currentQuestionRef.current;
     const correctAnswer = currentQuestion.a * currentQuestion.b;
-    
+
     setFeedback({ isCorrect: false, correctAnswer });
     setAnswers((prev) => [
       ...prev,
@@ -35,12 +35,10 @@ export default function SquareQuizScreen({ questions, t, onFinish, onFinishEarly
   }, []);
 
   useEffect(() => {
-    setTimeLeft(ANSWER_TIME_LIMIT);
-    
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -62,11 +60,11 @@ export default function SquareQuizScreen({ questions, t, onFinish, onFinishEarly
   const handleSubmit = (e) => {
     e.preventDefault();
     if (feedback.isCorrect !== null) return;
-    
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     const answer = Number(userAnswer);
     const isCorrect = answer === correctAnswer;
     setFeedback({ isCorrect, correctAnswer });
@@ -92,6 +90,7 @@ export default function SquareQuizScreen({ questions, t, onFinish, onFinishEarly
       if (currentIndex === questions.length - 1) {
         onFinish(answers);
       } else {
+        setTimeLeft(ANSWER_TIME_LIMIT); // reset timer for next question
         setCurrentIndex((prev) => prev + 1);
         setUserAnswer('');
         setFeedback({ isCorrect: null, correctAnswer: null });
