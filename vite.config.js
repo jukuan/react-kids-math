@@ -12,7 +12,7 @@ export default defineConfig({
         'favicon.svg', 
         'pwa-192x192.png', 
         'pwa-512x512.png', 
-        'mascot-removebg.png',
+        'mascot-transparent-bg.png',
       ],
       manifest: {
         name: 'Табліца множання для дзяцей',

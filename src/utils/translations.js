@@ -26,6 +26,7 @@ export const translations = {
     authorWebsite: 'Author website',
     feedbackEmail: 'Feedback',
     download: 'Download',
+    addition: 'Addition',
   },
   ru: {
     appTitle: 'Таблица умножения',
@@ -54,6 +55,7 @@ export const translations = {
     authorWebsite: 'Сайт автора',
     feedbackEmail: 'Обратная связь',
     download: 'Скачать',
+    addition: 'Сложение',
   },
   by: {
     appTitle: 'Табліца множання',
@@ -82,6 +84,7 @@ export const translations = {
     authorWebsite: 'Сайт аўтара',
     feedbackEmail: 'Зваротная сувязь',
     download: 'Спампаваць',
+    addition: 'Складанне',
   },
   pl: {
     appTitle: 'Tabliczka mnożenia',
@@ -110,6 +113,7 @@ export const translations = {
     authorWebsite: 'Strona autora',
     feedbackEmail: 'Opinie',
     download: 'Pobierz',
+    addition: 'Dodawanie',
   },
   es: {
     appTitle: 'Tabla de multiplicar',
@@ -138,5 +142,6 @@ export const translations = {
     authorWebsite: 'Sitio del autor',
     feedbackEmail: 'Comentarios',
     download: 'Descargar',
+    addition: 'Suma',
   },
 };

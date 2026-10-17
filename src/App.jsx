@@ -2,10 +2,12 @@ import { useState, useCallback } from 'react';
 import QuizScreen from './components/QuizScreen';
 import SquareQuizScreen from './components/SquareQuizScreen';
 import DivisionQuizScreen from './components/DivisionQuizScreen';
+import AdditionQuizScreen from './components/AdditionQuizScreen';
 import SequenceGame from './components/SequenceGame';
 import ResultScreen from './components/ResultScreen';
 import StarDisplay from './components/StarDisplay';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import Footer from './components/Footer';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { translations } from './utils/translations';
 import {
@@ -14,8 +16,8 @@ import {
 } from './utils/questionGenerator';
 import { generateSquareQuestions } from './utils/squareQuestionGenerator';
 import { generateDivisionQuestions } from './utils/divisionQuestionGenerator';
+import { generateAdditionQuestions } from './utils/additionQuestionGenerator';
 import { updateTableStats } from './utils/stats';
-import Footer from './components/Footer';
 
 const QUESTIONS_PER_ROUND = 10;
 
@@ -30,6 +32,8 @@ export default function App() {
   const [lastMode, setLastMode] = useState('multiplication');
 
   const t = translations[language] || translations.en;
+
+  // ---- Start handlers ----
 
   const handleStartMultiplication = useCallback(() => {
     const newQuestions = generateWeightedQuestions(QUESTIONS_PER_ROUND, tableStats);
@@ -52,9 +56,18 @@ export default function App() {
     setScreen('division');
   }, []);
 
+  const handleStartAddition = useCallback(() => {
+    const newQuestions = generateAdditionQuestions(QUESTIONS_PER_ROUND);
+    setQuestions(newQuestions);
+    setLastMode('addition');
+    setScreen('addition');
+  }, []);
+
   const handleStartSequence = useCallback(() => {
     setScreen('sequence');
   }, []);
+
+  // ---- Finish handlers ----
 
   const handleQuizFinish = useCallback(
     (answers) => {
@@ -101,6 +114,19 @@ export default function App() {
     [setTotalStars]
   );
 
+  const handleAdditionFinish = useCallback(
+    (answers) => {
+      const score = answers.filter((a) => a.isCorrect).length;
+      setLastScore(score);
+
+      const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
+      setTotalStars((prev) => prev + earnedStars);
+
+      setScreen('result');
+    },
+    [setTotalStars]
+  );
+
   const handleSequenceFinish = useCallback(
     (result) => {
       setSequenceResult(result);
@@ -116,10 +142,10 @@ export default function App() {
     setScreen('menu');
   };
 
-  // New handlers for early finish
+  // ---- Early finish handlers ----
+
   const handleQuizFinishEarly = useCallback(
     (answers) => {
-      // If no answers, just go back to menu
       if (answers.length === 0) {
         setScreen('menu');
         return;
@@ -151,18 +177,33 @@ export default function App() {
     [handleDivisionFinish]
   );
 
+  const handleAdditionFinishEarly = useCallback(
+    (answers) => {
+      if (answers.length === 0) {
+        setScreen('menu');
+        return;
+      }
+      handleAdditionFinish(answers);
+    },
+    [handleAdditionFinish]
+  );
+
   return (
     <div className="app">
       {screen === 'menu' && (
         <div className="screen menu-screen">
           <div className="mascot">
-            <img src="/mascot-removebg.png" height="90" alt="mascot"/>
+            <img src="/mascot-transparent-bg.png" height="80" alt="mascot" />
           </div>
           <h1 className="app-title">{t.appTitle}</h1>
           <StarDisplay totalStars={totalStars} />
           <LanguageSwitcher language={language} onChange={setLanguage} />
 
           <div className="game-modes">
+            <button className="mode-btn" onClick={handleStartAddition}>
+              <span className="mode-icon">➕</span>
+              {t.addition}
+            </button>
             <button className="mode-btn" onClick={handleStartMultiplication}>
               <span className="mode-icon">✖️</span>
               {t.multiplication}
@@ -207,6 +248,15 @@ export default function App() {
           t={t}
           onFinish={handleDivisionFinish}
           onFinishEarly={handleDivisionFinishEarly}
+        />
+      )}
+
+      {screen === 'addition' && (
+        <AdditionQuizScreen
+          questions={questions}
+          t={t}
+          onFinish={handleAdditionFinish}
+          onFinishEarly={handleAdditionFinishEarly}
         />
       )}
 
