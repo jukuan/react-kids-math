@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
 const GRID_SIZE = 25;
-const NUM_COLS = 5;
 
 function shuffleArray(array) {
   const newArray = [...array];
@@ -13,7 +12,7 @@ function shuffleArray(array) {
 }
 
 export default function SequenceGame({ t, onFinish }) {
-  const [numbers, setNumbers] = useState(() =>
+  const [numbers] = useState(() =>
     shuffleArray(Array.from({ length: GRID_SIZE }, (_, i) => i + 1))
   );
   const [nextNumber, setNextNumber] = useState(1);
