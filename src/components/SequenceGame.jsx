@@ -19,45 +19,49 @@ export default function SequenceGame({ t, onFinish }) {
   const [mistakes, setMistakes] = useState(0);
   const [foundNumbers, setFoundNumbers] = useState([]);
   const [gameStarted, setGameStarted] = useState(false);
-  const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const elapsedTimeRef = useRef(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (gameStarted && nextNumber <= GRID_SIZE) {
-      timerRef.current = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-      }, 100);
+    if (!gameStarted) return;
+
+    timerRef.current = setInterval(() => {
+      elapsedTimeRef.current += 1;
+      setElapsedTime(elapsedTimeRef.current);
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameStarted]);
+
+  const finish = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-    return () => clearInterval(timerRef.current);
-  }, [gameStarted, nextNumber, startTime]);
+    onFinish({ time: elapsedTimeRef.current, mistakes });
+  };
 
   const handleNumberClick = (number) => {
     if (!gameStarted) {
       setGameStarted(true);
-      setStartTime(Date.now());
     }
 
     if (number === nextNumber) {
       setFoundNumbers([...foundNumbers, number]);
       if (nextNumber === GRID_SIZE) {
-        clearInterval(timerRef.current);
-        const finalTime = Math.floor((Date.now() - startTime) / 1000);
-        onFinish({ time: finalTime, mistakes });
+        finish();
       } else {
         setNextNumber(nextNumber + 1);
       }
     } else {
       setMistakes(mistakes + 1);
     }
-  };
-
-  const handleFinishEarly = () => {
-    clearInterval(timerRef.current);
-    const finalTime = startTime
-      ? Math.floor((Date.now() - startTime) / 1000)
-      : 0;
-    onFinish({ time: finalTime, mistakes });
   };
 
   return (
@@ -87,7 +91,7 @@ export default function SequenceGame({ t, onFinish }) {
         ))}
       </div>
 
-      <button className="secondary-btn" onClick={handleFinishEarly}>
+      <button className="secondary-btn" onClick={finish}>
         {t.finishRound}
       </button>
     </div>
