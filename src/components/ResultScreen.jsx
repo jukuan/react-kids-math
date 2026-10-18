@@ -9,13 +9,26 @@ export default function ResultScreen({
   onPlayAgain,
   hideHardTables = false,
 }) {
+  const isPerfect = score === totalQuestions;
+
   return (
     <div className="screen result-screen">
       <h2>
         {t.score}: {score} {t.outOf} {totalQuestions}
       </h2>
-      {score === totalQuestions && <p className="perfect-message">{t.perfect}</p>}
+
+      {isPerfect && (
+        <>
+          <p className="perfect-message">{t.perfect}</p>
+          <div className="fox-proud">
+            <img src="/mascot-transparent-bg.png" height="60" alt="fox" />
+            <p>{t.foxProud}</p>
+          </div>
+        </>
+      )}
+
       <StarDisplay totalStars={earnedStars} />
+
       {!hideHardTables && (
         <div className="hard-tables">
           {hardTables.length > 0 ? (
@@ -32,6 +45,7 @@ export default function ResultScreen({
           )}
         </div>
       )}
+
       <button className="primary-btn" onClick={onPlayAgain}>
         {t.playAgain}
       </button>

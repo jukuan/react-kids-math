@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import Header from './components/Header';
 import QuizScreen from './components/QuizScreen';
 import SquareQuizScreen from './components/SquareQuizScreen';
 import DivisionQuizScreen from './components/DivisionQuizScreen';
@@ -190,6 +191,8 @@ export default function App() {
 
   return (
     <div className="app">
+      {screen !== 'menu' && <Header/>}
+
       {screen === 'menu' && (
         <div className="screen menu-screen">
           <div className="mascot">
@@ -281,6 +284,14 @@ export default function App() {
           <h2>🎉 {t.score}: {lastScore} ⭐</h2>
           <p>{t.time}: {sequenceResult.time}s</p>
           <p>{t.mistakes}: {sequenceResult.mistakes}</p>
+
+          {sequenceResult.mistakes === 0 && (
+            <div className="fox-proud">
+              <img src="/mascot-transparent-bg.png" height="60" alt="fox" />
+              <p>{t.foxProud}</p>
+            </div>
+          )}
+
           <button className="primary-btn" onClick={handleBackToMenu}>
             {t.backToMenu}
           </button>
