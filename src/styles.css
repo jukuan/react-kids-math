@@ -272,28 +272,33 @@ body {
 }
 
 /* Game modes menu */
+/* Game modes menu */
 .game-modes {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   width: 100%;
   margin-top: 5px;
 }
 
 .mode-btn {
-  line-height: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
-  padding: 14px 20px;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  min-height: 90px;
   background: white;
   border: 3px solid var(--secondary);
   border-radius: var(--radius);
   cursor: pointer;
   font-family: inherit;
-  font-size: 1.25rem;
+  font-size: 0.95rem;
   font-weight: bold;
+  line-height: 1.15;
   color: var(--text);
+  text-align: center;
   transition: all 0.2s;
 }
 
@@ -305,7 +310,13 @@ body {
 }
 
 .mode-icon {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+/* With an odd number of buttons (e.g. 5), let the last one span both columns */
+.game-modes > .mode-btn:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 /* Sequence game */

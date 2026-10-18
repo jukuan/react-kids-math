@@ -19,6 +19,8 @@ import { generateSquareQuestions } from './utils/squareQuestionGenerator';
 import { generateDivisionQuestions } from './utils/divisionQuestionGenerator';
 import { generateAdditionQuestions } from './utils/additionQuestionGenerator';
 import { updateTableStats } from './utils/stats';
+import SubtractionQuizScreen from './components/SubtractionQuizScreen';
+import { generateSubtractionQuestions } from './utils/subtractionQuestionGenerator';
 
 const QUESTIONS_PER_ROUND = 10;
 
@@ -31,6 +33,7 @@ export default function App() {
   const [lastScore, setLastScore] = useState(0);
   const [sequenceResult, setSequenceResult] = useState(null);
   const [lastMode, setLastMode] = useState('multiplication');
+  const [lastEarnedStars, setLastEarnedStars] = useState(0);
 
   const t = translations[language] || translations.en;
 
@@ -64,6 +67,13 @@ export default function App() {
     setScreen('addition');
   }, []);
 
+  const handleStartSubtraction = useCallback(() => {
+    const newQuestions = generateSubtractionQuestions(QUESTIONS_PER_ROUND);
+    setQuestions(newQuestions);
+    setLastMode('subtraction');
+    setScreen('subtraction');
+  }, []);
+
   const handleStartSequence = useCallback(() => {
     setScreen('sequence');
   }, []);
@@ -83,6 +93,7 @@ export default function App() {
 
       const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
       setTotalStars((prev) => prev + earnedStars);
+      setLastEarnedStars(earnedStars);
 
       setScreen('result');
     },
@@ -96,6 +107,7 @@ export default function App() {
 
       const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 5 : 0);
       setTotalStars((prev) => prev + earnedStars);
+      setLastEarnedStars(earnedStars);
 
       setScreen('result');
     },
@@ -109,6 +121,7 @@ export default function App() {
 
       const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
       setTotalStars((prev) => prev + earnedStars);
+      setLastEarnedStars(earnedStars);
 
       setScreen('result');
     },
@@ -122,6 +135,21 @@ export default function App() {
 
       const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
       setTotalStars((prev) => prev + earnedStars);
+      setLastEarnedStars(earnedStars);
+
+      setScreen('result');
+    },
+    [setTotalStars]
+  );
+
+  const handleSubtractionFinish = useCallback(
+    (answers) => {
+      const score = answers.filter((a) => a.isCorrect).length;
+      setLastScore(score);
+
+      const earnedStars = score + (score === QUESTIONS_PER_ROUND ? 3 : 0);
+      setTotalStars((prev) => prev + earnedStars);
+      setLastEarnedStars(earnedStars);
 
       setScreen('result');
     },
@@ -189,6 +217,17 @@ export default function App() {
     [handleAdditionFinish]
   );
 
+  const handleSubtractionFinishEarly = useCallback(
+    (answers) => {
+      if (answers.length === 0) {
+        setScreen('menu');
+        return;
+      }
+      handleSubtractionFinish(answers);
+    },
+    [handleSubtractionFinish]
+  );
+
   return (
     <div className="app">
       {screen !== 'menu' && <Header/>}
@@ -207,17 +246,21 @@ export default function App() {
               <span className="mode-icon">➕</span>
               {t.addition}
             </button>
+            <button className="mode-btn" onClick={handleStartSubtraction}>
+              <span className="mode-icon">➖</span>
+              {t.subtraction}
+            </button>
             <button className="mode-btn" onClick={handleStartMultiplication}>
               <span className="mode-icon">✖️</span>
               {t.multiplication}
             </button>
-            <button className="mode-btn" onClick={handleStartSquare}>
-              <span className="mode-icon">🔢</span>
-              {t.squareNumbers}
-            </button>
             <button className="mode-btn" onClick={handleStartDivision}>
               <span className="mode-icon">➗</span>
               {t.division}
+            </button>
+            <button className="mode-btn" onClick={handleStartSquare}>
+              <span className="mode-icon">🔢</span>
+              {t.squareNumbers}
             </button>
             <button className="mode-btn" onClick={handleStartSequence}>
               <span className="mode-icon">🔍</span>
@@ -263,6 +306,15 @@ export default function App() {
         />
       )}
 
+      {screen === 'subtraction' && (
+        <SubtractionQuizScreen
+          questions={questions}
+          t={t}
+          onFinish={handleSubtractionFinish}
+          onFinishEarly={handleSubtractionFinishEarly}
+        />
+      )}
+
       {screen === 'sequence' && (
         <SequenceGame t={t} onFinish={handleSequenceFinish} />
       )}
@@ -273,7 +325,7 @@ export default function App() {
           totalQuestions={QUESTIONS_PER_ROUND}
           t={t}
           hardTables={getHardTables(tableStats)}
-          earnedStars={lastScore + (lastScore === QUESTIONS_PER_ROUND ? 3 : 0)}
+          earnedStars={lastEarnedStars} 
           onPlayAgain={handleBackToMenu}
           hideHardTables={lastMode !== 'multiplication'}
         />

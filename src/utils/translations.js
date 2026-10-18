@@ -28,6 +28,7 @@ export const translations = {
     download: 'Download',
     addition: 'Addition',
     foxProud: 'Fox is proud of you!',
+    subtraction: 'Subtraction',
   },
   ru: {
     appTitle: 'Таблица умножения',
@@ -53,11 +54,12 @@ export const translations = {
     mistakes: 'Ошибки',
     backToMenu: 'В меню',
     finishRound: 'Завершить раунд',
-    authorWebsite: 'Сайт автора',
+    authorWebsite: 'Др проекты: ',
     feedbackEmail: 'Обратная связь',
     download: 'Скачать',
     addition: 'Сложение',
     foxProud: 'Лис тобой гордится!',
+    subtraction: 'Вычитание',
   },
   by: {
     appTitle: 'Табліца множання',
@@ -83,11 +85,12 @@ export const translations = {
     mistakes: 'Памылкі',
     backToMenu: 'У меню',
     finishRound: 'Скончыць раўнд',
-    authorWebsite: 'Сайт аўтара',
+    authorWebsite: 'Інш. праекты',
     feedbackEmail: 'Зваротная сувязь',
     download: 'Спампаваць',
     addition: 'Складанне',
     foxProud: 'Ліс ганарыцца табой!',
+    subtraction: 'Адыманне',
   },
   pl: {
     appTitle: 'Tabliczka mnożenia',
@@ -118,6 +121,7 @@ export const translations = {
     download: 'Pobierz',
     addition: 'Dodawanie',
     foxProud: 'Lis jest z ciebie dumny!',
+    subtraction: 'Odejmowanie',
   },
   es: {
     appTitle: 'Tabla de multiplicar',
@@ -148,5 +152,6 @@ export const translations = {
     download: 'Descargar',
     addition: 'Suma',
     foxProud: '¡El zorro está orgulloso de ti!',
+    subtraction: 'Resta',
   },
 };

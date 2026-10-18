@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# bin/git — project-local git wrapper.
+#
+# If an SSH key exists inside the project directory, it is used for all git
+# operations (push, pull, fetch, clone, ls-remote, ...). Otherwise the script
+# transparently delegates to the system git with no changes.
+#
+# Recognised key locations (first match wins):
+#   ./.id_rsa
+#   ./id_rsa
+#   ./.ssh/id_rsa
+#   ./.ssh/id_ed25519
+#   ./id_ed25519
+#
+# The key is resolved relative to the bin/ script's parent directory, so
+# `./bin/git pull` works from anywhere inside the project.
+#
+# IMPORTANT: add the key file to .gitignore so it is never committed.
+#
+# Usage:
+#   ./bin/git pull
+#   ./bin/git push origin main
+#   ./bin/git status
+
+set -euo pipefail
+
+# --- Locate the project root (parent of bin/) ------------------------------
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# --- Find a project-local SSH key -----------------------------------------
+
+KEY_CANDIDATES=(
+  "$PROJECT_ROOT/.id_rsa"
+  "$PROJECT_ROOT/id_rsa"
+  "$PROJECT_ROOT/.ssh/id_rsa"
+  "$PROJECT_ROOT/.ssh/id_ed25519"
+  "$PROJECT_ROOT/id_ed25519"
+)
+
+KEY=""
+for candidate in "${KEY_CANDIDATES[@]}"; do
+  if [[ -f "$candidate" ]]; then
+    KEY="$candidate"
+    break
+  fi
+done
+
+if [[ -n "$KEY" ]]; then
+  # ssh refuses keys with group/world-readable permissions — fix if needed.
+  perm="$(stat -c '%a' "$KEY" 2>/dev/null || stat -f '%Lp' "$KEY" 2>/dev/null || echo '')"
+  if [[ -n "$perm" && "$perm" != "600" && "$perm" != "400" ]]; then
+    echo "bin/git: tightening permissions on $KEY ($perm -> 600)" >&2
+    chmod 600 "$KEY" || true
+  fi
+
+  # IdentitiesOnly=yes prevents ssh from offering other keys (e.g. ssh-agent)
+  # and hitting "Too many authentication failures" on some servers.
+  export GIT_SSH_COMMAND="ssh -i $(printf '%q' "$KEY") -o IdentitiesOnly=yes"
+fi
+
+# --- Find the real git binary, skipping ourselves -------------------------
+# This matters if bin/ is added to PATH: calling `git` must not re-execute
+# this wrapper infinitely.
+
+SELF="$(cd "$SCRIPT_DIR" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+REAL_GIT=""
+
+IFS=: read -ra PATH_DIRS <<< "$PATH"
+for dir in "${PATH_DIRS[@]}"; do
+  candidate="$dir/git"
+  [[ -x "$candidate" ]] || continue
+  resolved="$(cd "$(dirname "$candidate")" 2>/dev/null && pwd)/$(basename "$candidate")"
+  if [[ "$resolved" != "$SELF" ]]; then
+    REAL_GIT="$candidate"
+    break
+  fi
+done
+
+if [[ -z "$REAL_GIT" ]]; then
+  echo "bin/git: could not find the real git binary in PATH" >&2
+  exit 127
+fi
+
+exec "$REAL_GIT" "$@"
